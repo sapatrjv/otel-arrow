@@ -8,3 +8,7 @@ pub mod geneva_exporter;
 /// Azure Monitor Exporter for Azure Logs Ingestion API
 #[cfg(feature = "azure-monitor-exporter")]
 pub mod azure_monitor_exporter;
+
+/// Request Response Exporter
+#[cfg(feature = "req-response-exporter")]
+pub mod req_response_exporter;
