@@ -17,12 +17,19 @@
 //!   - id: req-response-exporter
 //!     urn: "urn:microsoft:exporter:req-response"
 //! ```
+
+use std::collections::VecDeque;
+use std::net::SocketAddr;
 use async_trait::async_trait;
+use tokio::sync::Notify;
+use tokio::net::{TcpListener, TcpStream};
+use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
+use tokio::sync::Mutex;
+use std::time::Duration;
+use tokio::time::timeout;
 use linkme::distributed_slice;
-use otap_df_config::SignalType;
 use otap_df_config::node::NodeUserConfig;
 use otap_df_engine::ConsumerEffectHandlerExtension;
-use otap_df_engine::ExporterFactory;
 use otap_df_engine::config::ExporterConfig;
 use otap_df_engine::context::PipelineContext;
 use otap_df_engine::control::NodeControlMsg;
@@ -36,19 +43,13 @@ use otap_df_engine::terminal_state::TerminalState;
 use otap_df_pdata::otlp::OtlpProtoBytes;
 // Zero-copy view import (currently unused, for future optimization)
 // use otap_df_pdata::views::otap::OtapLogsView;
-use otap_df_pdata::{OtapArrowRecords, OtapPayload};
+use otap_df_pdata::OtapPayload;
 use otap_df_telemetry::instrument::Counter;
 use otap_df_telemetry::metrics::MetricSet;
 use otap_df_telemetry::otel_info;
 use otap_df_telemetry_macros::metric_set;
 use serde::Deserialize;
-use std::path::PathBuf;
 use std::sync::Arc;
-use futures::StreamExt;
-use futures::stream::TryStreamExt;
-use opentelemetry_proto::tonic::collector::logs::v1::ExportLogsServiceRequest;
-use opentelemetry_proto::tonic::collector::trace::v1::ExportTraceServiceRequest;
-use prost::Message as ProstMessage;
 // Use crate-relative paths since we're now a module within otap
 use otap_df_otap::OTAP_EXPORTER_FACTORIES;
 use otap_df_otap::metrics::ExporterPDataMetrics;
@@ -113,15 +114,15 @@ pub struct Config {
 struct ExporterMetrics {
     /// Total number of pData in cache.
     #[metric(unit = "{pData}")]
-    pub pData_count: Counter<u64>,
+    pub pdata_count: Counter<u64>,
 
     /// Total number of pData sent.
     #[metric(unit = "{pData}")]
-    pub pData_sent: Counter<u64>,
+    pub pdata_sent: Counter<u64>,
 
     /// Total number of pData Dropped.
     #[metric(unit = "{pData}")]
-    pub pData_dropped: Counter<u64>,
+    pub pdata_dropped: Counter<u64>,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -223,17 +224,27 @@ impl FifoCache {
     }
 
     /// Reserve (but do not remove) the head item; ensures only one inflight item at a time.
+
     async fn reserve_head(&self) -> CachedItem {
         loop {
-            {
-                let mut inner = self.inner.lock().await;
+            // lock scope is inside braces so it drops before await
+            if let Some(item) = {
+                let mut inner = self.inner.lock().await; // <-- FIX E0609
+
                 if inner.inflight.is_none() {
-                    if let Some(head) = inner.q.front() {
+                    if let Some(head) = inner.q.front().cloned() { // <-- FIX E0502
                         inner.inflight = Some(head.id);
-                        return head.clone();
+                        Some(head)
+                    } else {
+                        None
                     }
+                } else {
+                    None
                 }
+            } {
+                return item;
             }
+
             self.notify.notified().await;
         }
     }
@@ -276,6 +287,10 @@ pub struct ReqResponseExporter {
 
 
 impl ReqResponseExporter {
+    /// Constructs a request/response exporter from pipeline context and JSON config.
+    ///
+    /// This performs configuration validation and initializes internal state,
+    /// but does not start network listeners.
     pub fn from_config(
         pipeline_ctx: PipelineContext,
         config: &serde_json::Value,
@@ -299,6 +314,9 @@ impl ReqResponseExporter {
         })
     }
 
+    /// Returns the immutable configuration used by this request/response exporter.
+    ///
+    /// This reflects the validated configuration provided at construction time
     #[must_use]
     pub fn config(&self) -> &Config {
         &self.config
@@ -336,7 +354,7 @@ impl ReqResponseExporter {
 async fn handle_client(
     stream: TcpStream,
     cache: Arc<FifoCache>,
-    metrics: MetricSet<ExporterMetrics>,
+    mut metrics: MetricSet<ExporterMetrics>,
     ack_timeout: Duration,
 ) -> Result<(), String> {
     let (read_half, mut write_half) = stream.into_split();
@@ -415,7 +433,7 @@ async fn run_server(
         let (stream, _peer) = listener.accept().await.map_err(|e| e.to_string())?;
         let cache = cache.clone();
         let metrics = metrics.clone();
-        tokio::spawn(async move {
+        let _=tokio::spawn(async move {
             let _ = handle_client(stream, cache, metrics, ack_timeout).await;
         });
     }
@@ -460,7 +478,15 @@ impl Exporter<OtapPdata> for ReqResponseExporter {
             .config
             .listen_addr
             .parse()
-            .map_err(|e| Error::Other(format!("invalid listen_addr: {e}")))?;
+            .map_err(|e| {
+                // Build a config error...
+                let cfg_err = otap_df_config::error::Error::InvalidUserConfig {
+                    error: format!("invalid listen_addr: {e}"),
+                };
+                // ...then convert it to engine Error via From<Box<_>>
+                Error::from(Box::new(cfg_err))
+            })?;
+
 
         let ack_timeout = Duration::from_millis(self.config.ack_timeout_ms.max(1));
 
@@ -477,7 +503,7 @@ impl Exporter<OtapPdata> for ReqResponseExporter {
         {
             let cache = self.cache.clone();
             let metrics = self.metrics.clone();
-            tokio::spawn(async move {
+            let _=tokio::spawn(async move {
                 let _ = run_server(listen, cache, metrics, ack_timeout).await;
             });
         }
@@ -527,7 +553,7 @@ impl Exporter<OtapPdata> for ReqResponseExporter {
                     match ReqResponseExporter::payload_to_otlp_item(payload) {
                         Ok((kind, bytes)) => {
                             let (_id, dropped) = self.cache.push(kind, bytes).await;
-                            self.metrics.pdata_enqueued.add(1);
+                            self.metrics.pdata_sent.add(1);
                             if dropped > 0 {
                                 self.metrics.pdata_dropped.add(dropped as u64);
                             }
