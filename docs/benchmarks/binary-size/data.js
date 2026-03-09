@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1772935440161,
+  "lastUpdate": 1773021971624,
   "repoUrl": "https://github.com/sapatrjv/otel-arrow",
   "entries": {
     "Benchmark": [
@@ -2376,6 +2376,33 @@ window.BENCHMARK_DATA = {
           "url": "https://github.com/sapatrjv/otel-arrow/commit/5c721695aa73037cdde73161ee14c6d46685ba7f"
         },
         "date": 1772935437062,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "linux-amd64-binary-size",
+            "value": 87.02,
+            "unit": "MB"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Cijo Thomas",
+            "username": "cijothomas",
+            "email": "cijo.thomas@gmail.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "5c721695aa73037cdde73161ee14c6d46685ba7f",
+          "message": "azmonexporter - consolidate startup log (#2217)\n\n# Change Summary\n\nMerge the separate event for just the auth_type into startup itself,\nfollowing guidance from\nhttps://github.com/open-telemetry/otel-arrow/blob/main/rust/otap-dataflow/docs/telemetry/events-guide.md#consolidate-one-time-startup-information\n\n## How are these changes tested?\n\nRun locally\n\n## Are there any user-facing changes?\n\nLess noise of startup logs. No information lost.\n\n---------\n\nCo-authored-by: Drew Relmas <drewrelmas@gmail.com>",
+          "timestamp": "2026-03-06T21:09:22Z",
+          "url": "https://github.com/sapatrjv/otel-arrow/commit/5c721695aa73037cdde73161ee14c6d46685ba7f"
+        },
+        "date": 1773021969254,
         "tool": "customSmallerIsBetter",
         "benches": [
           {
