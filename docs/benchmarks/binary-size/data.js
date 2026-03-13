@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1773280813234,
+  "lastUpdate": 1773367358248,
   "repoUrl": "https://github.com/sapatrjv/otel-arrow",
   "entries": {
     "Benchmark": [
@@ -2484,6 +2484,33 @@ window.BENCHMARK_DATA = {
           "url": "https://github.com/sapatrjv/otel-arrow/commit/3a9f9427574388cd65127623bf57ab941b2219f8"
         },
         "date": 1773280810141,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "linux-amd64-binary-size",
+            "value": 88.23,
+            "unit": "MB"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Jake Dern",
+            "username": "JakeDern",
+            "email": "33842784+JakeDern@users.noreply.github.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "3a9f9427574388cd65127623bf57ab941b2219f8",
+          "message": "fix: Take otap spec into account when selecting schemas (#2240)\n\n# Change Summary\n\nThis PR fixes a bug with concatenation not taking the spec into account\nby:\n\n1. Adding some basic spec definitions that contain all of the allowed\npayload types per column\n2. Updating the concatenate code to take the spec into account along\nwith signal types\n\nI think the spec definitions are the most interesting part and I'd like\nto expand on these in future PRs for a variety of purposes including\ngenerating more robust test cases.\n\n## What issue does this PR close?\n\n* Closes #2204 \n\n## How are these changes tested?\n\nUnit\n\n## Are there any user-facing changes?\n\nNo\n\n---------\n\nCo-authored-by: albertlockett <a.lockett@f5.com>",
+          "timestamp": "2026-03-10T16:54:52Z",
+          "url": "https://github.com/sapatrjv/otel-arrow/commit/3a9f9427574388cd65127623bf57ab941b2219f8"
+        },
+        "date": 1773367355944,
         "tool": "customSmallerIsBetter",
         "benches": [
           {
