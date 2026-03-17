@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1773627465484,
+  "lastUpdate": 1773713106665,
   "repoUrl": "https://github.com/sapatrjv/otel-arrow",
   "entries": {
     "Benchmark": [
@@ -2597,6 +2597,33 @@ window.BENCHMARK_DATA = {
           {
             "name": "linux-amd64-binary-size",
             "value": 88.24,
+            "unit": "MB"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Drew Relmas",
+            "username": "drewrelmas",
+            "email": "drewrelmas@gmail.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "f35de846ed67be467f286bbbb394f93bb35116d7",
+          "message": "chore: Migrate topics, internal_telemetry_receiver, and perf_exporter… (#2323)\n\n… to core-nodes crate\n\n# Change Summary\n\nNext part of #1847 and #2086\n\nMoves:\n\n* perf_exporter\n* topic_exporter\n* internal_telemetry_receiver\n* topic_receiver\n\n## How are these changes tested?\n\n* Unit tests / CI\n* Compiled and ran `df_engine` and confirmed all nodes are still\navailable\n\n## Are there any user-facing changes?\n\nNo",
+          "timestamp": "2026-03-16T16:31:52Z",
+          "url": "https://github.com/sapatrjv/otel-arrow/commit/f35de846ed67be467f286bbbb394f93bb35116d7"
+        },
+        "date": 1773713104359,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "linux-amd64-binary-size",
+            "value": 86.62,
             "unit": "MB"
           }
         ]
