@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1773799761606,
+  "lastUpdate": 1773886170362,
   "repoUrl": "https://github.com/sapatrjv/otel-arrow",
   "entries": {
     "Benchmark": [
@@ -2651,6 +2651,33 @@ window.BENCHMARK_DATA = {
           {
             "name": "linux-amd64-binary-size",
             "value": 86.61,
+            "unit": "MB"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Aaron Marten",
+            "username": "AaronRM",
+            "email": "AaronRM@users.noreply.github.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "fccab3dee8377b9961907f74c89950875a1c002d",
+          "message": "fix(tests): adjust ACK mode handling in durable buffer tests (#2365)\n\n# Change Summary\n\nTwo tests had a race condition where the flip thread redundantly waited\nfor delivery (`counter > 0`) with a 5-second timeout, while the pipeline\nshutdown condition already waited for the same thing with a 15-second\nceiling. After permanent NACKs (which drop data rather than retry) the\npipeline must generate, buffer, and export entirely new data before the\ncounter increments. On slow CI this path can exceed 5 seconds, causing\nthe flip thread's assertion to fire before the pipeline has a chance to\ndeliver.\n\nThe fix removes the redundant delivery wait from the flip threads in\n`test_durable_buffer_permanent_nack_rejects_without_retry` and\n`test_durable_buffer_mixed_transient_and_permanent_nacks`, matching the\npattern already used in `test_durable_buffer_retries_on_nack`. Delivery\nis still verified by the post-pipeline `assert!(delivered > 0)` in each\ntest.\n\n* Closes #2354\n\n## How are these changes tested?\n\nValidated that tests pass when run locally in a loop. Will monitor CI\nresults after merging to confirm stability.\n\n## Are there any user-facing changes?\n\nNo.",
+          "timestamp": "2026-03-18T17:42:39Z",
+          "url": "https://github.com/sapatrjv/otel-arrow/commit/fccab3dee8377b9961907f74c89950875a1c002d"
+        },
+        "date": 1773886168076,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "linux-amd64-binary-size",
+            "value": 86.7,
             "unit": "MB"
           }
         ]
