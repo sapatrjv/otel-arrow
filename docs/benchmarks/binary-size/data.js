@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1775614786194,
+  "lastUpdate": 1775700688788,
   "repoUrl": "https://github.com/sapatrjv/otel-arrow",
   "entries": {
     "Benchmark": [
@@ -3218,6 +3218,33 @@ window.BENCHMARK_DATA = {
           {
             "name": "linux-amd64-binary-size",
             "value": 100.03,
+            "unit": "MB"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Utkarsh Umesan Pillai",
+            "username": "utpilla",
+            "email": "66651184+utpilla@users.noreply.github.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "f8611f8124df885610809c3b99cc2e7434b1a0c2",
+          "message": "Syslog CEF receiver: doc fixes and follow-up TODO from #2452 (#2461)\n\n# Change Summary\n\nSmall documentation improvements and a follow-up TODO for the syslog CEF\nreceiver, stemming from the review discussion on\nhttps://github.com/open-telemetry/otel-arrow/pull/2452#discussion_r3007878308.\n\n- TODO for message fragmentation: Add a TODO noting that truncated\nmessages currently emit the tail as a separate record without syslog\nheader context. Links to the review discussion for future work on\nfragment-correlation metadata.\n- Fix batching logic diagram: The ASCII diagram in README.md had\nmisaligned borders — the `max_batch_duration_ms` line was wider than the\nbox, causing the right-side `|` to not line up.\n- Add developer-reference note: Add a note at the top of\n`syslog-parsing-behavior.md` clarifying it is a developer/contributor\nreference doc and pointing to the README for user-facing configuration.\n\n## What issue does this PR close?\n\n* Closes #NNN\n\n## How are these changes tested?\n\n## Are there any user-facing changes?\n\nNo\n\n---------\n\nCo-authored-by: Utkarsh Umesan Pillai <utpilla@users.noreply.github.com>\nCo-authored-by: Laurent Quérel <l.querel@f5.com>",
+          "timestamp": "2026-03-31T00:15:18Z",
+          "url": "https://github.com/sapatrjv/otel-arrow/commit/f8611f8124df885610809c3b99cc2e7434b1a0c2"
+        },
+        "date": 1775700686092,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "linux-amd64-binary-size",
+            "value": 100.05,
             "unit": "MB"
           }
         ]
