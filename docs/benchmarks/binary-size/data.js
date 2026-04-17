@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1776306625717,
+  "lastUpdate": 1776392600234,
   "repoUrl": "https://github.com/sapatrjv/otel-arrow",
   "entries": {
     "Benchmark": [
@@ -3434,6 +3434,33 @@ window.BENCHMARK_DATA = {
           {
             "name": "linux-amd64-binary-size",
             "value": 103.24,
+            "unit": "MB"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Laurent Quérel",
+            "username": "lquerel",
+            "email": "l.querel@f5.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "f6dbd384b8013868513f25fd5955a988c17a2eba",
+          "message": "Fix topic shutdown and mixed publish semantics (#2631)\n\n## Change Summary\n\nThis PR extracts the topic-runtime fixes and refactorings from the\nlarger live-reconfiguration branch into a standalone change.\n\nThe core design decision in this PR is to move topic-specific waiting\nand delivery semantics back into the topic runtime instead of emulating\nthem in the topic receiver and topic exporter. Before this change, the\nnode layer carried its own retry/wait loops to handle blocked publish,\ndownstream backpressure, and shutdown/drain behavior. **That made\nshutdown under load fragile and allowed topic semantics to diverge\nacross code paths**.\n\nConcretely, this PR does four things:\n\n1. It makes the topic runtime own blocked publish waiting.\n- `publish(...)` / `publish_tracked(...)` now wait inside the topic\nimplementation instead of relying on node-side polling loops.\n- This removes the old timer-driven retry behavior from the topic\nexporter hot path and keeps `queue_on_full: block` wake-driven and\nshutdown-responsive.\n\n2. It introduces delivery leases on the subscribe side and uses them in\nthe topic receiver.\n- The receiver now distinguishes “the topic produced a message” from\n“the receiver successfully handed it downstream”.\n- That allows `DrainIngress` to stop polling the topic immediately while\nstill waiting for already-forwarded tracked messages to reach their\nterminal Ack/Nack outcome.\n- This fixes the previous shutdown bug where the topic receiver could\nreport drained state while continuing to run under load.\n\n3. It tightens mixed-topic semantics so publish behavior is consistent\nacross code paths.\n- Mixed `try_publish` is now all-or-nothing across balanced and\nbroadcast delivery.\n- If balanced delivery cannot admit a message, broadcast subscribers do\nnot receive it either.\n- Mixed async publish was also changed to avoid holding balanced-group\npermits while waiting on another full group, which removes the previous\npartial-permit convoy behavior.\n\n4. It keeps the refactor performance-oriented rather than purely\nstructural.\n- The topic receiver/exporter fast paths still try immediate\nforward/publish first.\n- The in-memory delivery-lease path now uses specialized inline storage\ninstead of per-message boxing on the common path.\n- The opaque fallback is still preserved for future non-in-memory\nbackends, but the in-memory backend no longer pays that allocation cost\nper delivered message.\n\n**This PR does not add new public routes, config knobs, or admin APIs.**\nThe existing topic publish/subscribe APIs remain source-compatible; the\nmain changes are semantic correctness under backpressure/shutdown and\nsimplification of where the waiting logic lives.\n\n## What issue does this PR close?\n\n* Closes\n[#2630](https://github.com/open-telemetry/otel-arrow/issues/2630)\n\n## How are these changes tested?\n\n- `cargo xtask check`\n\nKey topic/runtime guarantees covered by tests:\n- Balanced topics deliver each message exactly once within a subscriber\ngroup.\n- Balanced topics preserve per-subscriber ordering.\n- Broadcast topics deliver all messages to all subscribers in order.\n- Broadcast lag handling is isolated to the lagging subscriber and does\nnot block healthy subscribers.\n- Mixed async publish does not expose a message to broadcast subscribers\nbefore balanced admission succeeds.\n- Mixed `try_publish` is all-or-nothing: if balanced admission fails,\nbroadcast delivery does not happen.\n- Mixed async publish does not reserve permits in unrelated balanced\ngroups while waiting on a full group.\n- Dropping a blocked mixed publish does not leak a partial broadcast\ndelivery.\n- Blocking tracked publish does not leak in-flight capacity when\ncanceled.\n- Delivery leases preserve tracked message outcome semantics, including\nabort-to-nack behavior.\n- The in-memory delivery lease fast path uses specialized inline\nstorage, while the opaque fallback path still works.\n- Topic receiver `DrainIngress` exits promptly when Ack/Nack propagation\nis disabled.\n- Topic receiver `DrainIngress` waits for already-forwarded tracked work\nto complete when Ack/Nack propagation is enabled.\n- Topic receiver drain can interrupt a blocked downstream forward\nwithout hanging shutdown.\n- Topic exporter shutdown interrupts blocked untracked publish under\n`queue_on_full: block`.\n- Topic exporter shutdown interrupts blocked tracked publish under\n`queue_on_full: block`.\n- Topic exporter shutdown force-resolves buffered in-flight pdata it\nstill owns instead of hanging.\n- End-to-end topic exporter -> topic receiver flow still transfers pdata\ncorrectly.\n- End-to-end topic receiver source tagging still works when enabled.\n\nIn addition, this topic work was exercised in the larger\nlive-reconfiguration branch against the scenario that originally exposed\nthe shutdown issue (`topic_multitenant_isolation.yaml`), including\nreplace rollout, per-pipeline shutdown, and group shutdown flows.\n\n## Are there any user-facing changes?\n\nYes.\n\n- Topic-based pipelines shut down more reliably under backpressure.\n- Topic receiver drain behavior is now stricter and better aligned with\nAck/Nack propagation semantics.\n- Mixed-topic publish is now all-or-nothing across balanced and\nbroadcast delivery.\n- There are no new public APIs, config knobs, or route changes in this\nPR.",
+          "timestamp": "2026-04-16T00:51:52Z",
+          "url": "https://github.com/sapatrjv/otel-arrow/commit/f6dbd384b8013868513f25fd5955a988c17a2eba"
+        },
+        "date": 1776392597499,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "linux-amd64-binary-size",
+            "value": 102.96,
             "unit": "MB"
           }
         ]
