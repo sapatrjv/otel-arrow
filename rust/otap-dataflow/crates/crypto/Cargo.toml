@@ -1,0 +1,28 @@
+[package]
+name = "otap-df-crypto"
+description = "Shared rustls crypto-provider initialization for the OTAP dataflow engine"
+version.workspace = true
+authors.workspace = true
+repository.workspace = true
+license.workspace = true
+publish.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[lints]
+workspace = true
+
+[target.'cfg(any(target_os = "linux", target_os = "windows"))'.dependencies]
+rustls-symcrypt = { workspace = true, optional = true }
+
+[features]
+default = ["crypto-ring"]
+crypto-ring = ["dep:rustls", "rustls/ring"]
+crypto-aws-lc = ["dep:rustls", "rustls/aws_lc_rs"]
+crypto-openssl = ["dep:rustls", "dep:rustls-openssl"]
+crypto-symcrypt = ["dep:rustls", "dep:rustls-symcrypt"]
+
+[dependencies]
+cfg-if = { workspace = true }
+rustls = { workspace = true, optional = true }
+rustls-openssl = { workspace = true, optional = true }

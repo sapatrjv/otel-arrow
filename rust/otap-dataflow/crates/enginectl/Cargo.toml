@@ -16,15 +16,12 @@ path = "src/main.rs"
 [lints]
 workspace = true
 
-[target.'cfg(any(target_os = "linux", target_os = "windows"))'.dependencies]
-rustls-symcrypt = { workspace = true, optional = true }
-
 [features]
 default = ["crypto-ring"]
-crypto-ring = ["otap-df-admin-api/crypto-ring", "dep:rustls", "rustls/ring"]
-crypto-aws-lc = ["otap-df-admin-api/crypto-aws-lc", "dep:rustls", "rustls/aws_lc_rs"]
-crypto-openssl = ["otap-df-admin-api/crypto-openssl", "dep:rustls", "dep:rustls-openssl"]
-crypto-symcrypt = ["otap-df-admin-api/crypto-symcrypt", "dep:rustls", "dep:rustls-symcrypt"]
+crypto-ring = ["otap-df-admin-api/crypto-ring"]
+crypto-aws-lc = ["otap-df-admin-api/crypto-aws-lc"]
+crypto-openssl = ["otap-df-admin-api/crypto-openssl"]
+crypto-symcrypt = ["otap-df-admin-api/crypto-symcrypt"]
 
 [dependencies]
 otap-df-admin-api = { path = "../admin-api", default-features = false, features = ["http-client"] }
@@ -42,8 +39,6 @@ serde_yaml = { workspace = true }
 tempfile = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true, features = ["macros", "rt-multi-thread", "signal", "time"] }
-rustls = { workspace = true, optional = true }
-rustls-openssl = { workspace = true, optional = true }
 
 [dev-dependencies]
 wiremock = { workspace = true }

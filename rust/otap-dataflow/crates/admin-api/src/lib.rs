@@ -6,6 +6,8 @@
 mod endpoint;
 mod error;
 
+pub mod crypto;
+
 #[cfg(feature = "http-client")]
 mod client;
 #[cfg(feature = "http-client")]

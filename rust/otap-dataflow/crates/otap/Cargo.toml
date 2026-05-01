@@ -32,12 +32,12 @@ smallvec = { workspace = true }
 bytes = { workspace = true }
 parking_lot = { workspace = true }
 base64 = { workspace = true }
-cfg-if.workspace = true
 
 otap-df-engine = { workspace = true }
 otap-df-engine-macros = { workspace = true }
 otap-df-channel = { workspace = true }
 otap-df-config = { workspace = true }
+otap-df-crypto = { workspace = true }
 otap-df-pdata = { workspace = true, features = ["testing"] }
 otap-df-telemetry = { workspace = true }
 otap-df-telemetry-macros = { workspace = true }
@@ -77,10 +77,10 @@ rustls-symcrypt = { workspace = true, optional = true }
 
 [features]
 test-utils = ["rustls/ring", "otap-df-pdata/testing"]
-crypto-ring = ["rustls/ring", "tokio-rustls/ring"]
-crypto-aws-lc = ["rustls/aws_lc_rs", "tokio-rustls/aws-lc-rs"]
-crypto-openssl = ["dep:rustls-openssl", "tonic/tls-native-roots"]
-crypto-symcrypt = ["dep:rustls-symcrypt", "tonic/tls-native-roots"]
+crypto-ring = ["otap-df-crypto/crypto-ring", "rustls/ring", "tokio-rustls/ring"]
+crypto-aws-lc = ["otap-df-crypto/crypto-aws-lc", "rustls/aws_lc_rs", "tokio-rustls/aws-lc-rs"]
+crypto-openssl = ["otap-df-crypto/crypto-openssl", "dep:rustls-openssl", "tonic/tls-native-roots"]
+crypto-symcrypt = ["otap-df-crypto/crypto-symcrypt", "dep:rustls-symcrypt", "tonic/tls-native-roots"]
 azure = ["object_store/azure", "object_store/cloud", "dep:azure_identity", "dep:azure_core"]
 aws = ["object_store/aws", "object_store/cloud"]
 
