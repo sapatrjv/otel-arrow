@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1778899850990,
+  "lastUpdate": 1778986864103,
   "repoUrl": "https://github.com/sapatrjv/otel-arrow",
   "entries": {
     "Benchmark": [
@@ -4239,6 +4239,33 @@ window.BENCHMARK_DATA = {
           "url": "https://github.com/sapatrjv/otel-arrow/commit/b645a269cc18cba6310ca15648a990f4bdc94e68"
         },
         "date": 1778899847569,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "linux-amd64-binary-size",
+            "value": 108.92,
+            "unit": "MB"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Cijo Thomas",
+            "username": "cijothomas",
+            "email": "cithomas@microsoft.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "b645a269cc18cba6310ca15648a990f4bdc94e68",
+          "message": "fix: restore uncapped throughput in traffic generator (#2946)\n\nPR #2723 broke uncapped mode — saturation tests dropped from ~290K to\n~1.5K logs/sec. This restores the original behavior.",
+          "timestamp": "2026-05-13T00:41:34Z",
+          "url": "https://github.com/sapatrjv/otel-arrow/commit/b645a269cc18cba6310ca15648a990f4bdc94e68"
+        },
+        "date": 1778986861602,
         "tool": "customSmallerIsBetter",
         "benches": [
           {
