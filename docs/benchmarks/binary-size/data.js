@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1784341238067,
+  "lastUpdate": 1784428375345,
   "repoUrl": "https://github.com/sapatrjv/otel-arrow",
   "entries": {
     "Benchmark": [
@@ -6240,6 +6240,38 @@ window.BENCHMARK_DATA = {
           {
             "name": "linux-amd64-binary-size",
             "value": 109.4,
+            "unit": "MB"
+          },
+          {
+            "name": "linux-arm64-binary-size",
+            "value": 97.09,
+            "unit": "MB"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Siddhartha Mathiharan",
+            "username": "simathih",
+            "email": "42589365+simathih@users.noreply.github.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "c4df8317b2606d32e446ae1ff6766da264c66cb4",
+          "message": "Rust decoder shouldn't assume root payload is at position 0 (#2468)\n\n# Change Summary\n\nRust decoder shouldn't assume root payload is at position 0.\nWe know what root payload we're expecting so we can update the code to\nfill in the appropriate Logs/Metrics/Traces construct and then check for\nroot payload presence at the end.\n\n## What issue does this PR close?\n\nhttps://github.com/open-telemetry/otel-arrow/issues/2363\n\n* Closes #NNN\n\n## How are these changes tested?\n\n## Are there any user-facing changes?\n\n <!-- If yes, provide further info below -->\n\n---------\n\nCo-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>\nCo-authored-by: Cijo Thomas <cijo.thomas@gmail.com>\nCo-authored-by: albertlockett <a.lockett@f5.com>",
+          "timestamp": "2026-05-19T18:36:47Z",
+          "url": "https://github.com/sapatrjv/otel-arrow/commit/c4df8317b2606d32e446ae1ff6766da264c66cb4"
+        },
+        "date": 1784428371870,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "linux-amd64-binary-size",
+            "value": 109.41,
             "unit": "MB"
           },
           {
